@@ -1,20 +1,17 @@
 import { useState, useEffect } from "react";
-import initialTasks from "../mockdata/Tasks";
+import { useTasks } from "../components/TaskContext";
 import TaskCard from "./TaskCard";
 
 function TaskPreview() {
-  const [tasks, setTasks] = useState(() => {
-  const savedTasks = localStorage.getItem("tasks");
 
-  return savedTasks
-    ? JSON.parse(savedTasks)
-    : initialTasks;
-});
+  const { state, dispatch } = useTasks();
+  const { tasks, filter } = state;
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [filter, setFilter] = useState("all");
+
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);  
+
   const completedTasks = tasks.filter((task) => task.completed);
   const pendingTasks = tasks.filter((task) => !task.completed);
 
@@ -38,9 +35,12 @@ function TaskPreview() {
       title: newTaskTitle,
       category: "Learning",
       completed: false,
-    };
+    };  
 
-    setTasks([...tasks, newTask]);
+    dispatch({
+      type: "ADD_TASK",
+      payload: newTask,
+    });
     setNewTaskTitle("");
   };
 
@@ -77,7 +77,7 @@ function TaskPreview() {
 
         <div className="mt-6 flex gap-3">
           <button
-            onClick={() => setFilter("all")}
+            onClick={() => dispatch({ type: "SET_FILTER", payload: "all", }) }
             className={`rounded-lg px-4 py-2 ${
               filter === "all"
                 ? "bg-cyan-400 text-slate-950"
@@ -88,7 +88,12 @@ function TaskPreview() {
           </button>
 
           <button
-            onClick={() => setFilter("completed")}
+            onClick={() =>
+              dispatch({
+                type: "SET_FILTER",
+                payload: "completed",
+              })
+            }
             className={`rounded-lg px-4 py-2 ${
               filter === "completed"
                 ? "bg-cyan-400 text-slate-950"
@@ -99,7 +104,12 @@ function TaskPreview() {
           </button>
 
           <button
-            onClick={() => setFilter("pending")}
+            onClick={() =>
+              dispatch({
+                type: "SET_FILTER",
+                payload: "pending",
+              })
+            }
             className={`rounded-lg px-4 py-2 ${
               filter === "pending"
                 ? "bg-cyan-400 text-slate-950"

@@ -1,4 +1,6 @@
+import { useTasks } from "../components/TaskContext";
 function TaskCard({ task }) {
+  const { dispatch } = useTasks();
   const { title, ...taskDetails } = task;  
   return (
     <div
@@ -6,7 +8,13 @@ function TaskCard({ task }) {
     >
       <div className="flex items-center gap-4">
         <div
-          className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+          onClick={() =>
+            dispatch({
+              type: "TOGGLE_TASK",
+              payload: task.id,
+            })
+          }
+          className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border ${
             taskDetails.completed
               ? "border-cyan-400 bg-cyan-400"
               : "border-slate-600"
